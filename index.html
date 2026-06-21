@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>流量消耗器</title>
+  <meta name="keywords" content="IP查询,IP归属查询,在线测速,网速测试,多地IP查询">
+  <meta name="description" content="测试您的网速，多地查询您的IP地址，同时具备网络延迟实时检测">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <link rel="stylesheet" href="./res/dashlite.css">
+  <link rel="stylesheet" href="./res/style.css">
+</head>
+
+<body class="nk-body bg-light no-touch">
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="container-xl">
+        <div class="header-wrap">
+          <span class="header-title">流量消耗器</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="container-xl">
+        <div class="content-grid">
+
+          <!-- Speed Test Card -->
+          <div class="card">
+            <div class="card-body">
+              <!-- Test URL -->
+              <div class="form-group">
+                <label class="form-label">测试地址</label>
+                <div class="input-row">
+                  <select id="select" class="form-select form-control"
+                    onchange="document.getElementById('link').value=this.options[this.selectedIndex].value;setCookie('select',this.selectedIndex,365);">
+                    <option value="" id="diy">自定义</option>
+                    <option selected value="https://wppkg.baidupcs.com/issue/netdisk/apk/BaiduNetdisk_10.1.02.apk">百度 CDN</option>
+                    <option value="https://img.alicdn.com/imgextra/i1/O1CN01xA4P9S1JsW2WEg0e1_!!6000000001084-2-tps-2880-560.png">阿里 CDN</option>
+                    <option value="https://game.gtimg.cn/images/nz/web202106/index/bc_part1.gif?0.3190485611376561">腾讯 CDN</option>
+                    <option value="https://lf9-cdn-tos.bytecdntp.com/cdn/yuntu-index/1.0.4/case/maiteng/detailbg.png">字节跳动</option>
+                    <option value="https://img10.360buyimg.com/live/jfs/t1/128947/12/26918/1361527/6260e71bE0ee85af5/ecaa17ea8dd3dddb.jpg">京东</option>
+                    <option value="https://pic-bucket.ws.126.net/photo/0003/2022-04-24/H5N2082C00AJ0003NOS.jpg">网易</option>
+                    <option value="https://cnbj0.fds.api.xiaomi.com/b2c-data-mishop/9b9d95e1ece27d5ec75205e5fe719ba5.apk">小米</option>
+                    <option value="https://wwwstatic.vivo.com.cn/vivoportal/files/resource/funtouch/1651200648928/images/os2-jude-video.mp4">Vivo</option>
+                    <option value="https://img.mcloud.139.com/material_prod/material_media/20221128/1669626861087.png">和彩云</option>
+                    <option value="https://vod-origin-rjzy.gdoss.xstore.ctyun.cn/07da9eb52ad948c7b58b760003c0006b.mp4">天翼云</option>
+                    <option value="https://img.cmvideo.cn/publish/noms/2023/12/06/1O4SHFIFR36BD.gif">咪咕视频</option>
+                    <option value="https://img.aikan.miguvideo.com/publish/noms/2024/04/22/1O5MNLF3AN2JL.gif">咪咕爱看</option>
+                    <option value="https://gcache.migu.cn/prod/upload/game_resource/channel_for_homepage_game2/202501/0313/08/20250103130752641.mp4">咪咕快游</option>
+                    <option value="https://abs.twimg.com/responsive-web/client-web/main.ef558a8a.js">X-Speed</option>
+                    <option value="https://cachefly.cachefly.net/100mb.test">Cachefly</option>
+                  </select>
+                  <input value=""
+                    oninput="document.getElementById('select').selectedIndex=0;document.getElementById('diy').value=this.value;setCookie('diy',this.value,365);setCookie('select',0,365);"
+                    type="text" id="link" placeholder="输入自定义下载链接" autocomplete="off" class="form-input">
+                </div>
+              </div>
+
+              <!-- Thread Control -->
+              <div class="form-group">
+                <label class="form-label">线程数</label>
+                <div class="spinner">
+                  <button onclick="var t=document.getElementById('thread');if(t.value>t.min)t.value--;" class="spinner-btn">&minus;</button>
+                  <input onchange="var s=document.getElementById('thread');if(s.value<s.min)s.value=s.min;if(s.value>s.max)s.value=s.max"
+                    id="thread" type="number" min="1" max="32" value="10" class="spinner-input">
+                  <button onclick="var t=document.getElementById('thread');if(t.value<t.max)t.value++;" class="spinner-btn">&plus;</button>
+                </div>
+              </div>
+
+              <!-- Traffic Presets -->
+              <div class="form-group">
+                <label class="form-label">流量上限</label>
+                <div class="preset-row">
+                  <button class="preset-btn" onclick="setMaxPreset(500)">500MB</button>
+                  <button class="preset-btn" onclick="setMaxPreset(1024)">1GB</button>
+                  <button class="preset-btn" onclick="setMaxPresetCustom()">自定义</button>
+                </div>
+              </div>
+
+              <!-- Timer -->
+              <div class="form-group">
+                <label class="form-label">定时停止</label>
+                <div class="preset-row" id="timerRow">
+                  <button class="preset-btn" onclick="setTimer(10)">10秒</button>
+                  <button class="preset-btn" onclick="setTimer(30)">30秒</button>
+                  <button class="preset-btn" onclick="setTimer(60)">1分钟</button>
+                  <button class="preset-btn" onclick="setTimerCustom()">自定义</button>
+                </div>
+                <div class="timer-status" id="timerStatus"></div>
+              </div>
+
+              <!-- Background Run -->
+              <div class="form-group">
+                <div class="toggle-row">
+                  <span class="toggle-label-text">后台运行</span>
+                  <label class="switch">
+                    <input type="checkbox" id="bgRun">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Action Button Row -->
+              <div class="action-row">
+                <button onclick="botton_clicked();" type="button" id="do" class="btn-start">
+                  开始测速
+                </button>
+              </div>
+
+              <!-- Stats -->
+              <div class="stats">
+                <div class="stat-item" onclick='inputMax=prompt("请输入流量上限(GB)\n不填为不设置上限","");if(inputMax!==null)setMax(inputMax)'>
+                  <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                    </svg>
+                  </div>
+                  <div class="stat-label">总流量 <span id="showMax"></span></div>
+                  <div class="stat-value" id="total">---</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon stat-icon-accent">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                  </div>
+                  <div class="stat-label" id="describe">实时速度</div>
+                  <div class="stat-value stat-value-accent" id="speed">---</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v6l4 2"/>
+                    </svg>
+                  </div>
+                  <div class="stat-label">带宽</div>
+                  <div class="stat-value" id="mbps">---</div>
+                </div>
+              </div>
+
+              <!-- Peak Speed -->
+              <div class="peak-info" id="peakInfo" style="display:none">
+                <span class="peak-max">峰值 ↑ <span id="maxSpeed">---</span></span>
+                <span class="peak-min">谷值 ↓ <span id="minSpeed">---</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- IP Info Card -->
+          <div class="card card-sm">
+            <div class="card-body">
+              <h3 class="card-title">出口地址</h3>
+              <div class="ip-list">
+                <div class="ip-row">
+                  <span class="ip-tag">国内</span>
+                  <span class="ip-addr" id="ipcn">检测中...</span>
+                  <span class="ip-delay" id="laycn">---</span>
+                </div>
+                <div class="ip-row">
+                  <span class="ip-tag">海外</span>
+                  <span class="ip-addr" id="ipgb">检测中...</span>
+                  <span class="ip-delay" id="laygb">---</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <style>
+        .beian-bar{width:100%;background:transparent;padding:8px 0;text-align:center;font-size:12px;line-height:1.4;border-top:1px solid transparent}
+        .beian-pc{display:flex;justify-content:center;align-items:center;gap:12px}
+        .beian-disclaimer{color:#e74c3c;white-space:nowrap}
+        .beian-icp{color:#9ca3af;text-decoration:none;white-space:nowrap}
+        .beian-gongan{display:inline-flex;align-items:center;gap:4px;color:#9ca3af;text-decoration:none;white-space:nowrap}
+        .beian-gongan img{width:14px;height:14px}
+        @media(max-width:768px){.beian-pc{display:none}.beian-mobile{display:flex;flex-direction:column;align-items:center;gap:4px}.beian-mobile a,.beian-mobile span{display:block;line-height:1.6}}
+        @media(min-width:769px){.beian-mobile{display:none}}
+      </style>
+      <div class="beian-bar">
+        <div class="beian-pc">
+          <span class="beian-disclaimer">本站内容仅供学习和交流，非商业用途</span>
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="beian-icp">浙ICP备2025187466号</a>
+          <a href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33030402001483" target="_blank" rel="noopener noreferrer" class="beian-gongan">
+            <img src="https://www.937788.xyz/gonganbeian.png" alt="公安备案" onerror="this.style.display='none'">
+            浙公网安备33030402001483号
+          </a>
+        </div>
+        <div class="beian-mobile">
+          <span class="beian-disclaimer">本站内容仅供学习和交流，非商业用途</span>
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="beian-icp">浙ICP备2025187466号</a>
+          <a href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33030402001483" target="_blank" rel="noopener noreferrer" class="beian-gongan">
+            <img src="https://www.937788.xyz/gonganbeian.png" alt="公安备案" onerror="this.style.display='none'">
+            浙公网安备33030402001483号
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // 禁用移动端双击放大
+    var lastTouchEnd = 0;
+    if (!!('ontouchstart' in window || navigator.maxTouchPoints)) {
+      document.documentElement.addEventListener('touchend', function (event) {
+        var now = Date.now();
+        if (now - lastTouchEnd <= 300) { event.preventDefault(); }
+        lastTouchEnd = now;
+      }, { passive: false });
+    }
+
+    function show(num, des, flo) {
+      var cnum = num;
+      var total_index = 0;
+      while (cnum >= 1024) {
+        if (total_index == des.length - 1) break;
+        cnum = cnum / 1024;
+        total_index++;
+      }
+      return cnum.toFixed(flo[total_index]) + des[total_index];
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      var expires = "expires=" + d.toGMTString();
+      document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+    function getCookie(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+      }
+      return "";
+    }
+
+    document.getElementById('diy').value = getCookie("diy");
+    var selector = document.getElementById("select");
+    var savedIndex = getCookie("select");
+    if (savedIndex && savedIndex < selector.options.length) selector.selectedIndex = savedIndex;
+    selector = document.getElementById("select");
+    document.getElementById('link').value = selector.options[selector.selectedIndex].value;
+
+    var Maximum = 0;
+    setMax(getCookie('Max'));
+
+    function setMax(inputMax) {
+      if (inputMax > 0) {
+        setCookie("Max", inputMax, 365);
+        Maximum = inputMax * 1073741824;
+        document.getElementById("showMax").innerText = ' / ' + show(Maximum, ['B', 'KB', 'MB', 'GB', 'TB', 'PB'], [0, 0, 1, 2, 2, 2]);
+      } else {
+        Maximum = 0;
+        document.getElementById("showMax").innerText = '';
+        setCookie("Max", 0, 365);
+      }
+    }
+
+    // 流量预设
+    function setMaxPreset(mb) {
+      if (mb > 0) {
+        setMax(mb / 1024);
+      } else {
+        setMax(0);
+      }
+    }
+
+    function setMaxPresetCustom() {
+      var mb = prompt('请输入流量上限（MB）\n不填为不设置上限', '');
+      if (mb === '' || mb === null) {
+        setMax(0);
+      } else if (mb > 0) {
+        setMax(parseFloat(mb) / 1024);
+      }
+    }
+
+    var stopTimer = null;
+    var timerSeconds = 0;
+
+    function setTimer(sec) {
+      timerSeconds = sec;
+      document.getElementById('timerStatus').innerText = '已设置 ' + sec + ' 秒后自动停止';
+      // 高亮选中按钮
+      updateTimerHighlight();
+    }
+
+    function setTimerCustom() {
+      var sec = prompt('请输入定时停止时间（秒）', '120');
+      if (sec !== null && sec > 0) {
+        timerSeconds = parseInt(sec);
+        document.getElementById('timerStatus').innerText = '已设置 ' + timerSeconds + ' 秒后自动停止';
+        updateTimerHighlight();
+      }
+    }
+
+    function updateTimerHighlight() {
+      var btns = document.querySelectorAll('#timerRow .preset-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('active');
+      }
+    }
+
+    function clearTimer() {
+      if (stopTimer) {
+        clearTimeout(stopTimer);
+        stopTimer = null;
+      }
+      timerSeconds = 0;
+      document.getElementById('timerStatus').innerText = '';
+      updateTimerHighlight();
+    }
+  </script>
+
+  <script src="main.js?2"></script>
+</body>
+</html>
